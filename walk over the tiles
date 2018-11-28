@@ -1,0 +1,155 @@
+import pandas as pd
+import numpy as np
+# horizntal cell in this matrix... first 2 columns are position. 0,0; 0,1 etc. 
+# third position is wheter blocked (0) or open (1).
+# fourth position is index of whether / when visited. 0 means not visited yet. a number would indicate nth step.
+# total N * M tiles. blocked n * m. N,n - vertical. M,m - horizontal 
+# N(i) -> x.   M(j) -> y 
+
+while True:
+    try:
+        N = abs(int(input("Enter an int N between 1 and 20: ")))
+        M = abs(int(input("Enter an int M between 1 and 20: ")))
+        n = abs(int(input("Enter an int n between 1 and N/2: ")))
+        m = abs(int(input("Enter an int m between 1 and M/2: ")))
+        input_steps = abs(int(input("Enter how many steps. 0 means max possible steps: ")))
+        assert((N >= 1) & (N <= 20))
+        assert((M >= 1) & (M <= 20))
+        assert(n < N/2)
+        assert(m < M/2)
+        assert((N >= 1) & (N <= 20))
+        break
+    except:
+        print("Oops invalid input(s) ")
+
+
+arr = np.zeros((N*M)).astype(np.int32).reshape(M,N)
+
+for y in range(M):
+    for x in range(N):
+        if ((x < n) & (y < m)) | ((x > N-n-1) & (y > M-m-1)) | ((x > N-n-1) & (y < m)) | ((x < n) & (y > M-m-1)):
+            arr[y,x] = -1
+        else:
+            arr[y,x] = 0
+
+step = 1
+open_tiles = 0
+for j in range(M):
+    for i in range(N):
+        if (open_tiles == 0):
+            if (arr[j,i] != -1):
+                arr[j,i] = step
+                x = i
+                y = j
+                current_process = 'x+1'
+        if (arr[j,i] != -1):
+            open_tiles = open_tiles + 1
+if input_steps == 0:
+    total_steps = open_tiles
+else:
+    total_steps = input_steps
+#print ('a0 ', open_tiles, x,y,step,arr[y,x], current_process)
+#print(arr)
+
+for step in range(2, total_steps+1):
+    if current_process == 'x+1':
+        if (y-1 >= 0) and (arr[y-1,x] == 0):
+                arr[y-1,x] = step
+                y = y-1
+                current_process = 'y-1'
+                #print ('a1 ', x,y,step,arr[y,x], current_process)
+        elif (x+1 < N) and (arr[y,x+1] == 0):
+                arr[y,x+1] = step
+                x = x+1
+                current_process = 'x+1'
+                #print ('a2 ', x,y,step,arr[y,x], current_process)
+        elif (y+1 < M) and (arr[y+1,x] == 0):
+                arr[y+1,x] = step
+                y = y+1
+                current_process = 'y+1'
+                #print ('a3 ', x,y,step,arr[y,x], current_process)
+        
+    elif current_process == 'y+1':
+        if (x+1 < N) and (arr[y,x+1] == 0):
+                arr[y,x+1] = step
+                x = x+1
+                current_process = 'x+1'
+                #print ('a4 ', x,y,step,arr[y,x], current_process)
+        elif (y+1 < M) and (arr[y+1,x] == 0):
+                arr[y+1,x] = step
+                y = y+1
+                current_process = 'y+1'
+                #print ('a5 ', x,y,step,arr[y,x], current_process)
+        elif (x-1 >= 0) and (arr[y,x-1] == 0):
+                arr[y,x-1] = step
+                x = x-1
+                current_process = 'x-1'
+                #print ('a6 ', x,y,step,arr[y,x], current_process)
+                
+    elif current_process == 'x-1':
+        if (y+1 < M) and (arr[y+1,x] == 0):
+                arr[y+1,x] = step
+                y = y+1
+                current_process = 'y+1'
+                #print ('a7 ', x,y,step,arr[y,x], current_process)
+        elif (x-1 >= 0) and (arr[y,x-1] == 0):
+                arr[y,x-1] = step
+                x = x-1
+                current_process = 'x-1'
+                #print ('a8 ', x,y,step,arr[y,x], current_process)
+        elif (y-1 >= 0) and (arr[y-1,x] == 0):
+                arr[y-1,x] = step
+                y = y-1
+                current_process = 'y-1'
+                #print ('a9 ', x,y,step,arr[y,x], current_process)
+                
+    elif current_process == 'y-1':
+        if (x-1 >= 0) and (arr[y,x-1] == 0):
+                arr[y,x-1] = step
+                x = x-1
+                current_process = 'x-1'
+                #print ('aa ', x,y,step,arr[y,x], current_process)
+        elif (y-1 >= 0) and (arr[y-1,x] == 0):
+                arr[y-1,x] = step
+                y = y-1
+                current_process = 'y-1'
+                #print ('ab ', x,y,step,arr[y,x], current_process)
+        elif (x+1 < N) and (arr[y,x+1] == 0):
+                arr[y,x+1] = step
+                x = x+1
+                current_process = 'x+1'
+                #print ('ac ', x,y,step,arr[y,x], current_process)
+       
+    else:
+        break;
+
+    if step > arr[y,x]:
+        break;
+
+
+max_step = arr.max()
+
+y, x = np.where(arr == max_step)
+
+print('\n', 'open tiles =', open_tiles, 'steps iterated =', step, 'last step =', max_step, 'final tile = (', x[0], ',', y[0], ')','\n')
+df = pd.DataFrame(arr,columns=None)
+
+
+print(df)
+
+
+
+
+
+def highlight_max(data, color='orange'):
+    '''
+    highlight the maximum in a Series or DataFrame
+    '''
+    attr = 'background-color: {}'.format(color)
+    if data.ndim == 1:  # Series from .apply(axis=0) or axis=1
+        is_max = data == data.max()
+        return [attr if v else '' for v in is_max]
+    else:  # from .apply(axis=None)
+        is_max = data == data.max().max()
+        return pd.DataFrame(np.where(is_max, attr, ''), index=data.index, columns=data.columns)
+df.style.apply(highlight_max, color='yellow', axis=None)
