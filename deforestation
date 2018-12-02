@@ -1,0 +1,47 @@
+'''
+print("/n".join("".join(i) for i in ans))
+'''
+
+import sys
+input = sys.stdin.readline
+import numpy as np
+
+print("Enter # of trees upto 20")
+N = abs(int(input()))
+while (N > 20):
+  print("rectify # of trees")
+  N = int(input())
+
+trees = list()
+
+for i in range(0, N):
+  print("mass of tree valued upto 100", i)
+  mass = abs(int(input()))
+  while (mass > 100):
+    print("rectify mass of tree", i)
+    mass = abs(int(input()))
+  trees.append(mass)
+
+print("trees = " , trees )
+
+print("Enter # of queries, upto 10")
+Q = int(input())
+while (Q > 10):
+  print("rectify # of queries")
+  Q = int(input())
+
+query = np.zeros(Q*2).astype(np.int32).reshape(Q,2)
+
+for i in range(0, Q):
+  print("type values of a and b for query #", i)
+  a, b = [abs(int(x)) for x in input().split()]
+  while (a > b) | (b >= N):
+    print("rectify values of a and b for query #", i)
+    a, b = [abs(int(x)) for x in input().split()]
+  query[i] = [a,b]
+print(query)
+
+print ('----------------output----------------')
+for i in range(0, Q):
+  print(sum(trees[ query[i,0] : query[i,1] +1 ]))
+
